@@ -10,8 +10,8 @@ VEL = 27.0
 #simuation interval in seconds
 DT = 0.005
 #record location
-ROADPROFILELOCATION = '../datasets/'
-LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv', 'ts3_1_k_3.0.csv', 'ts3_2_k_3.0.csv', 'ts3_3_k_3.0.csv']
+ROADPROFILELOCATION = 'datasets/'
+LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv']
 
 class ProfileManager:
 
@@ -35,7 +35,7 @@ class ProfileManager:
 
         # TODO: else calls split function
 
-    def csv_to_profile(self, roadProfile, vel):
+    def csv_to_profile(self, roadProfile, vel=27):
         ## get road profile for a constant speed
         timeRecording = []
         tripRecording = []
