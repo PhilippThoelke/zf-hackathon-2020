@@ -11,7 +11,7 @@ VEL = 27.0
 DT = 0.005
 #record location
 ROADPROFILELOCATION = '../datasets/'
-LISTDATA = ['ts1_2_k_3.0.csv']
+LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv', 'ts3_1_k_3.0.csv', 'ts3_2_k_3.0.csv', 'ts3_3_k_3.0.csv']
 
 class ProfileManager:
 
@@ -35,7 +35,7 @@ class ProfileManager:
 
         # TODO: else calls split function
 
-    def csv_to_profile(self, roadProfile):
+    def csv_to_profile(self, roadProfile, vel):
         ## get road profile for a constant speed
         timeRecording = []
         tripRecording = []
@@ -49,13 +49,13 @@ class ProfileManager:
                 profile.append(float(row[2]))
 
         #get simulation time by constant speed
-        T = float(tripRecording[-1])/float(VEL)
+        T = float(tripRecording[-1])/float(vel)
 
         N = int(np.round(T/DT))
         t = np.linspace(0, T, N+1)
 
         #get driving speed vector e.g for dynamic (non constant) speed
-        v = np.ones(t.size)*VEL
+        v = np.ones(t.size)*vel
 
         #get trip at each dt
         trip = []
