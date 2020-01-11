@@ -135,7 +135,7 @@ class GeneticAlgorithm:
                 index += 1
 
 if __name__ == '__main__':
-    timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')
+    timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S-conv')
     path = '../models/' + timestamp
     os.makedirs(path)
 
