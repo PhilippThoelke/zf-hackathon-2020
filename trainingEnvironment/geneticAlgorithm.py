@@ -1,6 +1,7 @@
 from tensorflow.keras import models, layers
 from environment import Simulator
 import numpy as np
+from matplotlib import pyplot as plt
 
 class GeneticAlgorithm:
 
@@ -8,27 +9,22 @@ class GeneticAlgorithm:
     NUM_SURVIVORS = 2
     MUTATION_RATE = 0.05
     MUTATION_SCALE = 1
-    EVALUATION_STEPS = 10
+    EVALUATION_STEPS = 200
 
     def __init__(self):
         self.population = np.array([GeneticAlgorithm._get_model() for _ in range(GeneticAlgorithm.POPULATION_SIZE)])
-        self.env = Simulator(5)
-
-    def _run_simulation(model):
-        env = Simulator(5)
-        x = env.states[-1]
-        for step in range(GeneticAlgorithm.EVALUATION_STEPS):
-            x = env.next(model(x.reshape((1,) + x.shape)))
-        return env.score()
+        self.history = []
 
     def evaluate(self):
         fitness = []
         for model in self.population:
-            fitness.append(GeneticAlgorithm._run_simulation(model))
+            fitness.append(GeneticAlgorithm._simulate(model))
         return fitness
 
     def optimization_step(self):
         fitness = self.evaluate()
+        self.history.append(np.max(fitness))
+
         # remove worst performing models from the population
         to_replace = np.argwhere(np.argsort(fitness) >= GeneticAlgorithm.NUM_SURVIVORS)[:,0]
         survivors = np.argwhere(np.argsort(fitness) < GeneticAlgorithm.NUM_SURVIVORS)[:,0]
@@ -44,6 +40,13 @@ class GeneticAlgorithm:
 
             # insert the new model into the population
             self.population[i] = GeneticAlgorithm._get_model(weights=new_weights)
+
+    def _simulate(model):
+        env = Simulator()
+        x = env.states[-1]
+        for step in range(GeneticAlgorithm.EVALUATION_STEPS):
+            x = env.next(model(x.reshape((1,) + x.shape)).numpy()[0,0])
+        return env.score()
 
     def _crossover(weights1, weights2):
         new_weights = []
@@ -74,4 +77,8 @@ class GeneticAlgorithm:
 
 if __name__ == '__main__':
     ga = GeneticAlgorithm()
-    ga.optimization_step()
+    for step in range(10):
+        ga.optimization_step()
+
+    plt.plot(ga.history)
+    plt.show()
