@@ -16,9 +16,6 @@ c = 560         #linear constant of active suspension [N/A]
 dt = 0.005
 
 class Simulator:
-
-    N = 50
-
     def __init__(self, k=3):
         self.k = k
         self.states = []
@@ -36,13 +33,11 @@ class Simulator:
         # return initial state
         self.states = [self.initial_state]
 
-    def last_n_states(self):
-        # poss on list of last last n states
-        return np.array(self.states[-Simulator.N:])
+    def get_states(self):
+        return np.array(self.states)
 
     def t_target(self):
-        # return the score for the current simulation (fitness)
-        last = self.last_n_states()
+        last = self.get_states()
 
         # extract Zb acceleration from the last N states
         Zb_dtdt = last[:,2]
@@ -68,8 +63,7 @@ class Simulator:
         return target
 
     def constraint_satisfied(self):
-        # return the score for the current simulation (fitness)
-        last = self.last_n_states()
+        last = self.get_states()
 
         # extract Zt acceleration from the last N states
         Zt_dtdt = last[:,5]
@@ -82,6 +76,7 @@ class Simulator:
         return devZt_dtdt <= F_stat_bound
 
     def score(self):
+        # return the score for the current simulation (fitness)
         target = self.t_target()
         satisfied = self.constraint_satisfied()
 
