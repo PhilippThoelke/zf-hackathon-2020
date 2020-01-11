@@ -11,7 +11,7 @@ VEL = 27.0
 DT = 0.005
 #record location
 ROADPROFILELOCATION = '../datasets/'
-LISTDATA = ['ts1_2_k_3.0.csv']
+LISTDATA = ['ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv', 'ts3_2_k_3.0.csv']
 
 class ProfileManager:
 
