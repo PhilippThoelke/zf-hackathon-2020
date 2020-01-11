@@ -5,7 +5,11 @@ class Simulator:
         pass
 
     def next(self, current):
+        # perform one solving step of the differential equation using the given current i
+
+        # return the current state
         return np.zeros(6)
 
     def reset(self):
-        pass
+        # return initial state
+        return np.zeros(6)
