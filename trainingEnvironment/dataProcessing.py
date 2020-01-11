@@ -31,9 +31,10 @@ class ProfileManager:
 
         # if no split -> all data to training data
         if (not split):
-            self.training_profile = [self.csv_to_profile(roadProfile) for roadProfile in LISTDATA]
+            self.training_profile = [ProfileManager.csv_to_profile(roadProfile) for roadProfile in LISTDATA]
 
         # TODO: else calls split function
+
 
     def csv_to_profile(self, roadProfile, vel=27):
         ## get road profile for a constant speed
