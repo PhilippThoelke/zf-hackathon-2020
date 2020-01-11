@@ -16,11 +16,12 @@ dt = 0.005
 
 class Simulator:
 
-    def __init__(self, n):
+    N = 10
+
+    def __init__(self):
         self.states = []
         self.initial_state = np.zeros(9, dtype=np.float32)
         self.reset()
-        self.n = n
 
     def next(self, i_new):
         # perform one solving step of the differential equation using the given current i
@@ -37,13 +38,13 @@ class Simulator:
 
     def passs_on(self):
         # poss on list of last last n states
-        return self.states[-self.n:]
+        return self.states[-Simulator.N:]
 
     def score(self):
         # return the score for the current simulation (fitness)
         return 0
 
-    def activeSuspension(self, Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i_old, Zh, Zh_dt, i ):
+    def activeSuspension(self, Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i_old, Zh, Zh_dt, i):
         # old : (Zb, Zt, Zb_dt, Zt_dt, Zh, Zh_dt, i, dt):
         '''
         --- Quarter Car Suspension Model vgl. hackathon task ---
@@ -78,5 +79,5 @@ class Simulator:
         updated_Zh =  0
         updated_Zh_dt = 0
 
-        return (updated_Zb, updated_Zb_dt, updated_Zb_dtdt, updated_Zt, updated_Zt_dt, updated_Zt_dtdt, i, updated_Zh, updated_Zh_dt )
+        return np.array([updated_Zb, updated_Zb_dt, updated_Zb_dtdt, updated_Zt, updated_Zt_dt, updated_Zt_dtdt, i, updated_Zh, updated_Zh_dt], dtype=np.float32)
 

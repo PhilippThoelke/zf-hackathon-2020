@@ -12,10 +12,9 @@ class GeneticAlgorithm:
 
     def __init__(self):
         self.population = np.array([GeneticAlgorithm._get_model() for _ in range(GeneticAlgorithm.POPULATION_SIZE)])
-        self.env = Simulator(5)
 
     def _run_simulation(model):
-        env = Simulator(5)
+        env = Simulator()
         x = env.states[-1]
         for step in range(GeneticAlgorithm.EVALUATION_STEPS):
             x = env.next(model(x.reshape((1,) + x.shape)))
