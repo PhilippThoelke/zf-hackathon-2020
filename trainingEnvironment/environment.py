@@ -45,6 +45,7 @@ class Simulator:
         # return the score for the current simulation (fitness)
         last = self.last_n_states()
 
+        # ------------- T_target -------------
         # extract Zb acceleration from the last N states
         Zb_dtdt = last[:,2]
 
@@ -66,6 +67,20 @@ class Simulator:
 
         #compute T_target
         target = self.k * varZb_dtdt_h + varZb_dtdt
+
+        # ------------- additional constraint -------------
+        # extract Zt acceleration from the last N states
+        Zt_dtdt = last[:,5]
+
+        #standard deviation of Zt_dtdt
+        devZt_dtdt = np.std(Zt_dtdt * Mt)
+
+        #boundary condition
+        F_stat_bound = (Mb + Mt) * 9.81 / 3.0
+        constraint_satisfied = devZt_dtdt <= F_stat_bound
+
+        if not constraint_satisfied:
+            target *= 10
         return target
 
     def activeSuspension(self, Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i_old, Zh, Zh_dt, i):
