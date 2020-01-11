@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import signal
 
 #do not change constants parameter
 Mb = 500        #mass quarter body [kg]
@@ -16,16 +17,17 @@ dt = 0.005
 
 class Simulator:
 
-    N = 10
+    N = 50
 
-    def __init__(self):
+    def __init__(self, k=3):
+        self.k = k
+
         self.states = []
         self.initial_state = np.zeros(9, dtype=np.float32)
         self.reset()
 
     def next(self, i_new):
         # perform one solving step of the differential equation using the given current i
-
         new_state = self.activeSuspension(*self.states[-1], i_new)
         self.states.append(new_state)
         # return the current state
@@ -33,16 +35,38 @@ class Simulator:
 
     def reset(self):
         # return initial state
-        self.states = []
-        self.states.append(self.initial_state)
+        self.states = [self.initial_state]
 
-    def passs_on(self):
+    def last_n_states(self):
         # poss on list of last last n states
-        return self.states[-Simulator.N:]
+        return np.array(self.states[-Simulator.N:])
 
     def score(self):
         # return the score for the current simulation (fitness)
-        return 0
+        last = self.last_n_states()
+
+        # extract Zb acceleration from the last N states
+        Zb_dtdt = last[:,2]
+
+        #compute bandpass 2nd order from 0.4 - 3 Hz
+        b, a = Simulator._butter_bandpass(0.4, 3, int(1 / dt), 2)
+        zi = signal.lfilter_zi(b, a)
+        z, _ = signal.lfilter(b, a, Zb_dtdt, zi=zi)
+
+        #calculate variance alpha_1
+        varZb_dtdt = np.var(z)
+
+        #compute bandpass 2nd order from 0.4 - 3 Hz
+        b, a = Simulator._butter_bandpass(10, 30, int(1 / dt), 1)
+        zi = signal.lfilter_zi(b, a)
+        z1, _ = signal.lfilter(b, a, Zb_dtdt, zi=zi)
+
+        #calculate variance alpha_2
+        varZb_dtdt_h = np.var(z1)
+
+        #compute T_target
+        target = self.k * varZb_dtdt_h + varZb_dtdt
+        return target
 
     def activeSuspension(self, Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i_old, Zh, Zh_dt, i):
         # old : (Zb, Zt, Zb_dt, Zt_dt, Zh, Zh_dt, i, dt):
@@ -76,8 +100,14 @@ class Simulator:
         updated_Zt = Zt + updated_Zt_dt * dt
 
         # TO DO : get new road profile values (Zh, Zh_dt)
-        updated_Zh =  0
+        updated_Zh = 0
         updated_Zh_dt = 0
 
         return np.array([updated_Zb, updated_Zb_dt, updated_Zb_dtdt, updated_Zt, updated_Zt_dt, updated_Zt_dtdt, i, updated_Zh, updated_Zh_dt], dtype=np.float32)
 
+    def _butter_bandpass(lowcut, highcut, fs, order):
+        nyq = 0.5 * fs
+        low = lowcut / nyq
+        high = highcut / nyq
+        b, a = signal.butter(order, [low, high], btype='band')
+        return b, a
