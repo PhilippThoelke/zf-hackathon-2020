@@ -24,13 +24,13 @@ class ANN(nn.Module):
 
 class GeneticAlgorithm:
 
-    EPOCHS = 50
-    POPULATION_SIZE = 32
-    NUM_SURVIVORS = 5
+    EPOCHS = 250
+    POPULATION_SIZE = 40
+    NUM_SURVIVORS = 8
     MUTATION_RATE = 0.025
     MUTATION_SCALE = 1
-    EVALUATION_STEPS = 1000
-    EVALUATION_REPEATS = 5
+    EVALUATION_STEPS = 1500
+    EVALUATION_REPEATS = 8
 
     def __init__(self):
         self.history = []
