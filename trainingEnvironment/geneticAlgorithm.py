@@ -5,13 +5,16 @@ from matplotlib import pyplot as plt
 import torch
 from torch import nn
 from joblib import Parallel, delayed
+import datetime
+import os
 
 class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(9, 8), torch.relu,
-            nn.Linear(8, 1), torch.sigmoid
+            nn.Linear(9, 4), torch.relu,
+            nn.Linear(4, 4), torch.relu,
+            nn.Linear(4, 1), torch.sigmoid
         ]
 
     def forward(self, x):
@@ -21,11 +24,13 @@ class ANN(nn.Module):
 
 class GeneticAlgorithm:
 
+    EPOCHS = 50
     POPULATION_SIZE = 32
-    NUM_SURVIVORS = 16
-    MUTATION_RATE = 0.05
+    NUM_SURVIVORS = 5
+    MUTATION_RATE = 0.025
     MUTATION_SCALE = 1
-    EVALUATION_STEPS = 750
+    EVALUATION_STEPS = 1000
+    EVALUATION_REPEATS = 5
 
     def __init__(self):
         self.history = []
@@ -36,8 +41,18 @@ class GeneticAlgorithm:
         self.road_profile = ProfileManager()
 
     def evaluate(self):
-        fitness = Parallel(n_jobs=8)(delayed(GeneticAlgorithm._simulate)(model, self.road_profile.training_profile[0]) for model in self.population)
-        return np.array(fitness)
+        fitness = np.zeros(len(self.population))
+        for step in range(GeneticAlgorithm.EVALUATION_REPEATS):
+            # choose a random road from the CSVs
+            road = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.training_profile))]
+            # choose a random offset from the start of the current road
+            road_offset = np.random.randint(0, len(road) - GeneticAlgorithm.EVALUATION_STEPS)
+
+            # evaluate all models on the current road section
+            fitness += Parallel(n_jobs=-1)(delayed(GeneticAlgorithm._simulate)(model, road, road_offset) for model in self.population)
+
+        # return the mean fitness for each model across multiple road sections
+        return fitness / len(self.population)
 
     def optimization_step(self):
         fitness = self.evaluate()
@@ -60,10 +75,22 @@ class GeneticAlgorithm:
             # insert the new model into the population
             GeneticAlgorithm._set_weights(self.population[i], new_weights)
 
-    def _simulate(model, road_profile):
-        env = Simulator(road_profile)
+        return self.population[0]
+
+    def save_model(model, path):
+        torch.save(model.state_dict(), path)
+
+    def load_model(path):
+        model = ANN()
+        model.load_state_dict(torch.load(path))
+        return model
+
+    def _simulate(model, road_profile, road_offset):
+        # instantiate a new simulator
+        env = Simulator(road_profile, road_offset)
         x = env.states[-1]
         for step in range(GeneticAlgorithm.EVALUATION_STEPS):
+            # simulate the car's behaviour and pass new i (damper current) values
             x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
             x = env.next(model(x_torch)[0,0] * 2)
         return env.score()
@@ -103,11 +130,16 @@ class GeneticAlgorithm:
                 index += 1
 
 if __name__ == '__main__':
+    timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')
+    path = '../models/' + timestamp
+    os.makedirs(path)
+
     ga = GeneticAlgorithm()
-    for step in range(100):
-        if step > 0:
-            print(f'Optimization step {step} (fitness: {ga.history[-1]})')
-        ga.optimization_step()
+    for epoch in range(GeneticAlgorithm.EPOCHS):
+        if epoch > 0:
+            print(f'Optimization step {epoch} (fitness: {ga.history[-1]})')
+        best = ga.optimization_step()
+        GeneticAlgorithm.save_model(best, f'{path}/model_{epoch}.roadie')
 
     plt.plot(ga.history)
     plt.show()
