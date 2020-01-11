@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 import torch
 from torch import nn
 from joblib import Parallel, delayed
+import datetime
+import os
 
 class ANN(nn.Module):
     def __init__(self):
@@ -73,6 +75,11 @@ class GeneticAlgorithm:
             # insert the new model into the population
             GeneticAlgorithm._set_weights(self.population[i], new_weights)
 
+        return self.population[0]
+
+    def save_model(model, path):
+        torch.save(model.state_dict(), path)
+
     def _simulate(model, road_profile, road_offset):
         # instantiate a new simulator
         env = Simulator(road_profile, road_offset)
@@ -118,11 +125,16 @@ class GeneticAlgorithm:
                 index += 1
 
 if __name__ == '__main__':
+    timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')
+    path = '../models/' + timestamp
+    os.makedirs(path)
+
     ga = GeneticAlgorithm()
     for epoch in range(GeneticAlgorithm.EPOCHS):
         if epoch > 0:
             print(f'Optimization step {epoch} (fitness: {ga.history[-1]})')
-        ga.optimization_step()
+        best = ga.optimization_step()
+        GeneticAlgorithm.save_model(best, f'{path}/model_{epoch}.roadie')
 
     plt.plot(ga.history)
     plt.show()
