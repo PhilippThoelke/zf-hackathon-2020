@@ -135,11 +135,12 @@ class GeneticAlgorithm:
                 index += 1
 
 if __name__ == '__main__':
+    ga = GeneticAlgorithm()
+    
     timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S-conv')
     path = '../models/' + timestamp
     os.makedirs(path)
 
-    ga = GeneticAlgorithm()
     for epoch in range(GeneticAlgorithm.EPOCHS):
         if epoch > 0:
             print(f'Optimization step {epoch} (fitness: {ga.history[-1]})')
