@@ -80,6 +80,11 @@ class GeneticAlgorithm:
     def save_model(model, path):
         torch.save(model.state_dict(), path)
 
+    def load_model(path):
+        model = ANN()
+        model.load_state_dict(torch.load(path))
+        return model
+
     def _simulate(model, road_profile, road_offset):
         # instantiate a new simulator
         env = Simulator(road_profile, road_offset)
