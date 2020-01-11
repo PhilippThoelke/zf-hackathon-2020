@@ -1,36 +1,43 @@
-from tensorflow.keras import models, layers
 from environment import Simulator
+from dataProcessing import ProfileManager
+from tensorflow.keras import models, layers
 import numpy as np
 from matplotlib import pyplot as plt
+from threading import Thread
 
 class GeneticAlgorithm:
 
-    POPULATION_SIZE = 3
-    NUM_SURVIVORS = 2
-    MUTATION_RATE = 0.05
+    POPULATION_SIZE = 20
+    NUM_SURVIVORS = 10
+    MUTATION_RATE = 0.025
     MUTATION_SCALE = 1
-    EVALUATION_STEPS = 200
+    EVALUATION_STEPS = 750
 
     def __init__(self):
-        self.population = np.array([GeneticAlgorithm._get_model() for _ in range(GeneticAlgorithm.POPULATION_SIZE)])
         self.history = []
+        print('Generating population...')
+        self.population = np.array([GeneticAlgorithm._get_model() for _ in range(GeneticAlgorithm.POPULATION_SIZE)])
+
+        print('Loading road profile...')
+        self.road_profile = ProfileManager()
 
     def evaluate(self):
         fitness = []
         for model in self.population:
-            fitness.append(GeneticAlgorithm._simulate(model))
-        return fitness
+            fitness.append(self._simulate(model))
+        return np.array(fitness)
 
     def optimization_step(self):
         fitness = self.evaluate()
-        self.history.append(np.max(fitness))
+        self.history.append(np.min(fitness))
 
         # remove worst performing models from the population
-        to_replace = np.argwhere(np.argsort(fitness) >= GeneticAlgorithm.NUM_SURVIVORS)[:,0]
-        survivors = np.argwhere(np.argsort(fitness) < GeneticAlgorithm.NUM_SURVIVORS)[:,0]
-        for i in to_replace:
+        indices = np.argsort(fitness)
+        fitness = fitness[indices]
+        self.population = self.population[indices]
+        for i in range(GeneticAlgorithm.NUM_SURVIVORS, len(self.population)):
             # randomly choose two parents from the surviving population
-            parent1, parent2 = np.random.choice(self.population[survivors], size=2, replace=False)
+            parent1, parent2 = np.random.choice(self.population[:GeneticAlgorithm.NUM_SURVIVORS], size=2, replace=False)
             weights1 = parent1.get_weights()
             weights2 = parent2.get_weights()
 
@@ -41,8 +48,8 @@ class GeneticAlgorithm:
             # insert the new model into the population
             self.population[i] = GeneticAlgorithm._get_model(weights=new_weights)
 
-    def _simulate(model):
-        env = Simulator()
+    def _simulate(self, model):
+        env = Simulator(self.road_profile.training_profile[0])
         x = env.states[-1]
         for step in range(GeneticAlgorithm.EVALUATION_STEPS):
             x = env.next(model(x.reshape((1,) + x.shape)).numpy()[0,0])
@@ -77,7 +84,9 @@ class GeneticAlgorithm:
 
 if __name__ == '__main__':
     ga = GeneticAlgorithm()
-    for step in range(10):
+    for step in range(25):
+        if step > 0:
+            print(f'Optimization step {step} (fitness: {ga.history[-1]})')
         ga.optimization_step()
 
     plt.plot(ga.history)
