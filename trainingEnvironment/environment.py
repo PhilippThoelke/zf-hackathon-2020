@@ -16,8 +16,8 @@ c = 560         #linear constant of active suspension [N/A]
 dt = 0.005
 
 class Simulator:
-    def __init__(self, road_profile, k=3):
-        self.current_road_position = 1
+    def __init__(self, road_profile, road_offset=0, k=3):
+        self.current_road_position = road_offset + 1
         self.road_profile = road_profile
         self.k = k
 
