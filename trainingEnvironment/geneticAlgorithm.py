@@ -12,8 +12,12 @@ class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(9, 4), torch.relu,
-            nn.Linear(4, 4), torch.relu,
+            nn.Conv1d(9, 4, 4), torch.relu,
+            nn.MaxPool1d(3),
+            nn.Conv1d(4, 4, 4), torch.relu,
+            nn.MaxPool1d(3),
+            nn.Flatten(),
+            nn.Linear(16, 4), torch.sigmoid,
             nn.Linear(4, 1), torch.sigmoid
         ]
 
@@ -88,11 +92,12 @@ class GeneticAlgorithm:
     def _simulate(model, road_profile, road_offset):
         # instantiate a new simulator
         env = Simulator(road_profile, road_offset)
-        x = env.states[-1]
         for step in range(GeneticAlgorithm.EVALUATION_STEPS):
             # simulate the car's behaviour and pass new i (damper current) values
-            x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
-            x = env.next(model(x_torch)[0,0] * 2)
+            x = env.last_steps()
+            x = x.reshape((1,) + x.shape)
+            x = torch.from_numpy(x).permute(0, 2, 1)
+            env.next(model(x)[0,0] * 2)
         return env.score()
 
     def _crossover(weights1, weights2):

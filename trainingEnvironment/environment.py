@@ -16,6 +16,9 @@ c = 560         #linear constant of active suspension [N/A]
 dt = 0.005
 
 class Simulator:
+
+    LAST_STEPS_COUNT = 50
+
     def __init__(self, road_profile, road_offset=0, k=3):
         self.current_road_position = road_offset + 1
         self.road_profile = road_profile
@@ -38,6 +41,15 @@ class Simulator:
 
     def get_states(self):
         return np.array(self.states)
+
+    def last_steps(self):
+        if len(self.states) >= Simulator.LAST_STEPS_COUNT:
+            return np.array(self.states[-Simulator.LAST_STEPS_COUNT:])
+        else:
+            steps = np.zeros((Simulator.LAST_STEPS_COUNT, 9), dtype=np.float32)
+            for i, step in enumerate(self.states):
+                steps[i + (Simulator.LAST_STEPS_COUNT - len(self.states))] = step
+            return steps
 
     def t_target(self):
         last = self.get_states()
