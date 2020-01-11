@@ -11,7 +11,7 @@ VEL = 27.0
 DT = 0.005
 #record location
 ROADPROFILELOCATION = '../datasets/'
-LISTDATA = ['ts3_1_k_3.0.csv']
+LISTDATA = ['ts1_2_k_3.0.csv']
 
 class ProfileManager:
 
@@ -70,7 +70,7 @@ class ProfileManager:
     # TODO: splitting in train and validation data
     # TODO: feed profile to simulator
 
-
-profi = ProfileManager()
-plt.plot(profi.training_profile[0])
-plt.show()
+if __name__ == '__main__':
+    profi = ProfileManager()
+    plt.plot(profi.training_profile[0])
+    plt.show()

@@ -16,22 +16,25 @@ c = 560         #linear constant of active suspension [N/A]
 dt = 0.005
 
 class Simulator:
-    def __init__(self, k=3):
+    def __init__(self, road_profile, k=3):
+        self.current_road_position = 1
+        self.road_profile = road_profile
         self.k = k
+
         self.states = []
-        self.initial_state = np.zeros(9, dtype=np.float32)
         self.reset()
 
     def next(self, i_new):
         # perform one solving step of the differential equation using the given current i
         new_state = self.active_suspension(*self.states[-1], i_new)
+        self.current_road_position += 1
         self.states.append(new_state)
         # return the current state
         return new_state
 
     def reset(self):
         # return initial state
-        self.states = [self.initial_state]
+        self.states = [np.zeros(9, dtype=np.float32)]
 
     def get_states(self):
         return np.array(self.states)
@@ -115,9 +118,10 @@ class Simulator:
         updated_Zt_dt = Zt_dt + updated_Zt_dtdt * dt
         updated_Zt = Zt + updated_Zt_dt * dt
 
-        # TO DO : get new road profile values (Zh, Zh_dt)
-        updated_Zh = 0
-        updated_Zh_dt = 0
+        # get new road profile values (Zh, Zh_dt)
+        pos = self.current_road_position
+        updated_Zh = self.road_profile[pos]
+        updated_Zh_dt = (self.road_profile[pos] - self.road_profile[pos - 1]) / dt
 
         return np.array([updated_Zb, updated_Zb_dt, updated_Zb_dtdt, updated_Zt, updated_Zt_dt, updated_Zt_dtdt, i, updated_Zh, updated_Zh_dt], dtype=np.float32)
 
