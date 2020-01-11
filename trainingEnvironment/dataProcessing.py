@@ -31,11 +31,11 @@ class ProfileManager:
 
         # if no split -> all data to training data
         if (not split):
-            self.training_profile = [self.csv_to_profile(roadProfile) for roadProfile in LISTDATA]
+            self.training_profile = [ProfileManager.csv_to_profile(roadProfile) for roadProfile in LISTDATA]
 
         # TODO: else calls split function
 
-    def csv_to_profile(self, roadProfile):
+    def csv_to_profile(roadProfile, vel):
         ## get road profile for a constant speed
         timeRecording = []
         tripRecording = []
@@ -49,13 +49,13 @@ class ProfileManager:
                 profile.append(float(row[2]))
 
         #get simulation time by constant speed
-        T = float(tripRecording[-1])/float(VEL)
+        T = float(tripRecording[-1])/float(vel)
 
         N = int(np.round(T/DT))
         t = np.linspace(0, T, N+1)
 
         #get driving speed vector e.g for dynamic (non constant) speed
-        v = np.ones(t.size)*VEL
+        v = np.ones(t.size)*vel
 
         #get trip at each dt
         trip = []
