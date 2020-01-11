@@ -21,14 +21,13 @@ class Simulator:
 
     def __init__(self, k=3):
         self.k = k
-
         self.states = []
         self.initial_state = np.zeros(9, dtype=np.float32)
         self.reset()
 
     def next(self, i_new):
         # perform one solving step of the differential equation using the given current i
-        new_state = self.activeSuspension(*self.states[-1], i_new)
+        new_state = self.active_suspension(*self.states[-1], i_new)
         self.states.append(new_state)
         # return the current state
         return new_state
@@ -41,11 +40,10 @@ class Simulator:
         # poss on list of last last n states
         return np.array(self.states[-Simulator.N:])
 
-    def score(self):
+    def t_target(self):
         # return the score for the current simulation (fitness)
         last = self.last_n_states()
 
-        # ------------- T_target -------------
         # extract Zb acceleration from the last N states
         Zb_dtdt = last[:,2]
 
@@ -67,8 +65,12 @@ class Simulator:
 
         #compute T_target
         target = self.k * varZb_dtdt_h + varZb_dtdt
+        return target
 
-        # ------------- additional constraint -------------
+    def constraint_satisfied(self):
+        # return the score for the current simulation (fitness)
+        last = self.last_n_states()
+
         # extract Zt acceleration from the last N states
         Zt_dtdt = last[:,5]
 
@@ -77,13 +79,17 @@ class Simulator:
 
         #boundary condition
         F_stat_bound = (Mb + Mt) * 9.81 / 3.0
-        constraint_satisfied = devZt_dtdt <= F_stat_bound
+        return devZt_dtdt <= F_stat_bound
 
-        if not constraint_satisfied:
+    def score(self):
+        target = self.t_target()
+        satisfied = self.constraint_satisfied()
+
+        if not satisfied:
             target *= 10
         return target
 
-    def activeSuspension(self, Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i_old, Zh, Zh_dt, i):
+    def active_suspension(self, Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i_old, Zh, Zh_dt, i):
         # old : (Zb, Zt, Zb_dt, Zt_dt, Zh, Zh_dt, i, dt):
         '''
         --- Quarter Car Suspension Model vgl. hackathon task ---
