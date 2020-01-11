@@ -1,0 +1,31 @@
+#!/bin/bash
+#$ -N _log_parameter_search
+#$ -l mem=4G
+#$ -cwd
+#$ -l h_rt=01:30:00
+#$ -l h=*cippy*
+#$ -o /dev/null
+#$ -e /dev/null
+
+echo "*** Start of SGE job ***"
+date
+# Identify Job-ID
+echo ""
+echo "Hostname"
+echo "$HOSTNAME"
+echo $JOB_ID
+echo 'Job-ID:'
+echo $JOB_ID
+echo ""
+echo "Start"
+echo ""
+
+source source ~/hack20/bin/activate
+
+python3 runDamperProfileGrid.py
+
+deactivate
+
+echo ""
+date
+echo "*** End of SGE job ***"
