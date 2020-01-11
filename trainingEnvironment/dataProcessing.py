@@ -35,7 +35,7 @@ class ProfileManager:
 
         # TODO: else calls split function
 
-    def csv_to_profile(roadProfile, vel):
+    def csv_to_profile(roadProfile, vel=27):
         ## get road profile for a constant speed
         timeRecording = []
         tripRecording = []
