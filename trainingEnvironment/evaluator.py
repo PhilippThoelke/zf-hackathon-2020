@@ -85,4 +85,4 @@ if __name__ == '__main__':
 
     df = pd.DataFrame(data=history, columns=['t', 'Zh', 'Zt', 'Zb', 'Zt_dtdt', 'Zb_dtdt', 'i'])
     print(df)
-    df.to_csv('result.csv', index=False)
+    df.to_csv('results/' + ROAD_PROFILE_EVAL + '_result.csv', index=False)
