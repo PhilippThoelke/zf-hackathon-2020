@@ -6,7 +6,7 @@ import pandas as pd
 
 MODEL_PATH = 'models/2020_01_11-18_33_27/model_49.roadie'
 ROAD_PROFILE_FILE = 'ts3_1_k_3.0.csv'
-VELOCITY = 8
+VELOCITY = [8]
 DT = 0.005
 
 print(f'Loading model "{MODEL_PATH.split("/")[-1]}"')
