@@ -48,8 +48,8 @@ def constraint_satisfied(history):
 
 df = pd.read_csv('HalfTimeScoring_tf_3_1_vel27.0.csv')
 
-print(t_target(df.values))
-print(constraint_satisfied(df.values))
+print('T_target:', t_target(df.values))
+print('Constraint satisfied:', constraint_satisfied(df.values))
 
 df['i'].plot()
 plt.show()

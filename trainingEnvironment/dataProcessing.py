@@ -69,7 +69,7 @@ class ProfileManager:
 
             #get the road profile by the tripRecording
             profiles.append(np.interp(trip, tripRecording, profile))
-
+        
         return profiles
 
     # TODO: splitting in train and validation data
