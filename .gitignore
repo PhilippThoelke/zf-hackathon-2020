@@ -134,8 +134,14 @@ datasets/
 # models folder
 models/
 
+# model files
+*.roadie
+
 # results files
 *.csv
 
 # plots
 *.png
+
+# pickle files
+*.pickle

@@ -8,15 +8,14 @@ from joblib import Parallel, delayed
 import datetime
 import os
 from hyperparameters import *
+import pickle
 
 
 class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(9, 4), torch.relu,
-            nn.Linear(4, 4), torch.relu,
-            nn.Linear(4, 1), torch.sigmoid
+            nn.Linear(18, 1), torch.sigmoid
         ]
 
     def forward(self, x):
@@ -26,22 +25,21 @@ class ANN(nn.Module):
 
 class GeneticAlgorithm:
 
-
     def __init__(self):
         self.history = []
         print('Generating population...')
         self.population = np.array([GeneticAlgorithm._get_model() for _ in range(POPULATION_SIZE)])
 
         print('Loading road profile...')
-        self.road_profile = ProfileManager()
+        with open('road_profile.pickle', 'rb') as file:
+            self.road_profile = pickle.load(file)
 
     def evaluate(self):
         fitness = np.zeros(len(self.population))
         for step in range(EVALUATION_REPEATS):
             # choose a random road from the CSVs
             road = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.training_profile))]
-            # TO DO : choose k
-            k = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.k))]
+            k = 20#self.road_profile.k[np.random.randint(0, len(self.road_profile.k))]
             # choose a random offset from the start of the current road
             road_offset = np.random.randint(0, len(road) - EVALUATION_STEPS)
 
@@ -87,6 +85,10 @@ class GeneticAlgorithm:
         env = Simulator(road_profile, road_offset, k)
         x = env.states[-1]
         for step in range(EVALUATION_STEPS):
+            # add a moving average of the last states to the model's input
+            moving_avg = env.moving_average()
+            x = np.concatenate((x, moving_avg))
+
             # simulate the car's behaviour and pass new i (damper current) values
             x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
             x = env.next(model(x_torch)[0,0] * 2)
@@ -130,6 +132,19 @@ if __name__ == '__main__':
     timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')
     path = '../models/' + timestamp
     os.makedirs(path)
+
+    with open(path + '/model.meta', 'w') as file:
+        file.write('POP_SIZE {}\n'.format(POPULATION_SIZE))
+        file.write('N_SURVIVORS {}\n'.format(NUM_SURVIVORS))
+        file.write('M_RATE {}\n'.format(MUTATION_RATE))
+        file.write('M_SCALE {}\n'.format(MUTATION_SCALE))
+        file.write('STEPS {}\n'.format(EVALUATION_STEPS))
+        file.write('REPEATS {}\n'.format(EVALUATION_REPEATS))
+        file.write('EPOCHS {}\n'.format(EPOCHS))
+        file.write('\nMODEL_ARCHITECTURE:\n')
+        a = ANN()
+        file.write('\n'.join(['{}: {}->{}'.format(a.layers[i]._get_name(), a.layers[i].in_features, a.layers[i].out_features) for i in range(len(a.layers)) if hasattr(a.layers[i], 'in_features')]))
+
 
     ga = GeneticAlgorithm()
     for epoch in range(EPOCHS):
