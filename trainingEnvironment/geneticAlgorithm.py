@@ -15,9 +15,7 @@ class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(18, 8), torch.sigmoid,
-            nn.Linear(8, 4), torch.sigmoid,
-            nn.Linear(4, 1), torch.sigmoid
+            nn.Linear(18, 1), torch.sigmoid
         ]
 
     def forward(self, x):
