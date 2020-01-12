@@ -3,16 +3,12 @@ from dataProcessing import ProfileManager
 from environment import Simulator
 import torch
 import pandas as pd
-
-MODEL_PATH = 'models/2020_01_11-18_33_27/model_49.roadie'
-ROAD_PROFILE_FILE = 'ts3_1_k_3.0.csv'
-VELOCITY = [8]
-DT = 0.005
+from hyperparameters import *
 
 print(f'Loading model "{MODEL_PATH.split("/")[-1]}"')
 model = GeneticAlgorithm.load_model(MODEL_PATH)
-print(f'Loading evaluation road profile "{ROAD_PROFILE_FILE}"')
-road_profile = ProfileManager.csv_to_profile(ROAD_PROFILE_FILE, VELOCITY)
+print(f'Loading evaluation road profile "{ROAD_PROFILE_EVAL}"')
+road_profile = ProfileManager.csv_to_profile(ROAD_PROFILE_EVAL, VELOCITY_eval)
 
 history = []
 
