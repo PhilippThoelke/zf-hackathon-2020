@@ -33,6 +33,6 @@ LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.
 # Evaluator
 # where to store trained models
 MODEL_PATH = '../models/2020_01_12-17_14_23/model_8.roadie'
-ROAD_PROFILE_EVAL = 'ts1_2_k_3.0.csv'
+ROAD_PROFILE_EVAL = 'ts4_k_20.0.csv'
 # on which velocity to evaluate
 VELOCITY_eval = [27]
