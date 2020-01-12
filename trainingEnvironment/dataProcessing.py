@@ -2,7 +2,7 @@ import numpy as np
 import csv
 import os
 from scipy import signal
-from matplotlib import pyplot as plt
+import pickle
 
 # HYPERPARAMETER
 # driving speed [m/s] between 2 and 40
@@ -11,7 +11,8 @@ VEL = [8, 20, 27]
 DT = 0.005
 #record location
 ROADPROFILELOCATION = '../datasets/'
-LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv']
+LISTDATA = ['ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv',
+            'ts3_1_k_3.0.csv', 'ts3_2_k_3.0.csv', 'ts3_3_k_3.0.csv']
 
 class ProfileManager:
 
@@ -78,7 +79,6 @@ class ProfileManager:
     # TODO: feed profile to simulator
 
 if __name__ == '__main__':
-    profi = ProfileManager()
-    #print(len(profi.training_profile))
-    plt.plot(profi.training_profile[0])
-    plt.show()
+    profile = ProfileManager()
+    with open('road_profile.pickle', 'wb') as file:
+        pickle.dump(profile, file)
