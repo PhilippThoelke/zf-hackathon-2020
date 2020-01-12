@@ -6,13 +6,13 @@ import pandas as pd
 import numpy as np
 from hyperparameters import *
 from scipy import signal
+import pickle
 
 dt = 0.005
 
 #road specific weight factor
-tmp = ROAD_PROFILE_EVAL.split('_k_')
-tmp = tmp[1]
-k = float(tmp[:-4])
+tmp = ROAD_PROFILE_EVAL.split('_k_')[1].split('.csv')[0]
+k = float(tmp)
 
 Mb = 500        #mass quarter body [kg]
 Mt = 50        	#mass tire + suspention system [kg]
@@ -56,7 +56,8 @@ if __name__ == '__main__':
     print(f'Loading model "{MODEL_PATH.split("/")[-1]}"')
     model = GeneticAlgorithm.load_model(MODEL_PATH)
     print(f'Loading evaluation road profile "{ROAD_PROFILE_EVAL}"')
-    road_profile = ProfileManager.csv_to_profile(ROAD_PROFILE_EVAL, VELOCITY_eval)[0]
+    with open(ROAD_PROFILE_EVAL, 'rb') as file:
+        road_profile = pickle.load(file)
 
     history = []
 
