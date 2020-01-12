@@ -4,7 +4,7 @@ import os
 from scipy import signal
 from matplotlib import pyplot as plt
 from hyperparameters import *
-
+import pickle
 
 class ProfileManager:
 
@@ -72,7 +72,6 @@ class ProfileManager:
     # TODO: feed profile to simulator
 
 if __name__ == '__main__':
-    profi = ProfileManager()
-    #print(len(profi.training_profile))
-    plt.plot(profi.training_profile[0])
-    plt.show()
+    profile = ProfileManager()
+    with open('road_profile.pickle', 'wb') as file:
+        pickle.dump(profile, file)
