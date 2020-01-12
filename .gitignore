@@ -134,6 +134,9 @@ datasets/
 # models folder
 models/
 
+# model files
+*.roadie
+
 # results files
 *.csv
 
