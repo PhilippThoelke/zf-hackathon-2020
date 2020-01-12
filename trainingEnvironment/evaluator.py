@@ -6,9 +6,9 @@ import pandas as pd
 import numpy as np
 from scipy import signal
 
-MODEL_PATH = '../models/2020_01_11-20_21_33/model_101.roadie'
+MODEL_PATH = 'dense_29.roadie'#'../models/2020_01_11-20_21_33/model_101.roadie'
 ROAD_PROFILE_FILE = 'ts3_1_k_3.0.csv'
-VELOCITY = [8]
+VELOCITY = [20]
 DT = 0.005
 K = 3
 
@@ -63,9 +63,11 @@ print('Simulating...')
 for step in range(len(road_profile) - 1):
     Zb, Zb_dt, Zb_dtdt, Zt, Tz_dt, Zt_dtdt, last_i, Zh, Zh_dt = x
 
+    '''
     x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
     i = model(x_torch)[0,0].detach().numpy() * 2
-    #i = 0.4
+    '''
+    i = 0
 
     t = DT * step
     history.append([t, Zh, Zt, Zb, Zt_dtdt, Zb_dtdt, i])
