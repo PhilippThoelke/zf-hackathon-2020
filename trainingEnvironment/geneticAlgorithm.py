@@ -15,7 +15,8 @@ class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(18, 1), torch.sigmoid
+            nn.Linear(18, 8), torch.sigmoid,
+            nn.Linear(8, 1), torch.sigmoid
         ]
 
     def forward(self, x):
@@ -73,12 +74,10 @@ class GeneticAlgorithm:
         return self.population[0]
 
     def save_model(model, path):
-        torch.save(model.state_dict(), path)
+        torch.save(model, path)
 
     def load_model(path):
-        model = ANN()
-        model.load_state_dict(torch.load(path))
-        return model
+        return torch.load(path)
 
     def _simulate(model, road_profile, road_offset, k=3):
         # instantiate a new simulator
