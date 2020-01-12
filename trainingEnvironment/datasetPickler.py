@@ -1,10 +1,10 @@
 import pickle
 from dataProcessing import ProfileManager
 
-PATH = '../datasets/ts4_k_20.csv'
+FILE = 'ts4_k_20.0.csv'
 VELOCITY = 27
 
-road_profile = ProfileManager.csv_to_profile(PATH, VELOCITY)[0]
+road_profile = ProfileManager.csv_to_profile(FILE, VELOCITY)[0]
 
-with open(PATH.split('/')[-1] + '.pickle', 'wb') as file:
+with open(FILE + '.pickle', 'wb') as file:
     pickle.dump(road_profile)
