@@ -1,4 +1,4 @@
-# DOCUMENTATION: random baseline
+# ZF Closed Loop Hackathon 2020: Team RandomBaseline
 ## The Problem
 The task is to find a way to optimally control the current (parameter: i) applied to an active damping system in order to optimize comfort and safety.
 
