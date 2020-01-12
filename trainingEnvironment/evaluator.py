@@ -8,7 +8,11 @@ from hyperparameters import *
 from scipy import signal
 
 dt = 0.005
-k = 3
+
+#road specific weight factor
+tmp = ROAD_PROFILE_EVAL.split('_k_')
+tmp = tmp[1]
+k = float(tmp[:-4])
 
 Mb = 500        #mass quarter body [kg]
 Mt = 50        	#mass tire + suspention system [kg]
@@ -48,35 +52,36 @@ def constraint_satisfied(history):
     F_stat_bound = (Mb + Mt) * 9.81 / 3.0
     return devZt_dtdt <= F_stat_bound
 
-print(f'Loading model "{MODEL_PATH.split("/")[-1]}"')
-model = GeneticAlgorithm.load_model(MODEL_PATH)
-print(f'Loading evaluation road profile "{ROAD_PROFILE_EVAL}"')
-road_profile = ProfileManager.csv_to_profile(ROAD_PROFILE_EVAL, VELOCITY_eval)[0]
+if __name__ == '__main__':
+    print(f'Loading model "{MODEL_PATH.split("/")[-1]}"')
+    model = GeneticAlgorithm.load_model(MODEL_PATH)
+    print(f'Loading evaluation road profile "{ROAD_PROFILE_EVAL}"')
+    road_profile = ProfileManager.csv_to_profile(ROAD_PROFILE_EVAL, VELOCITY_eval)[0]
 
-history = []
+    history = []
 
-env = Simulator(road_profile)
-x = env.states[-1]
-print('Simulating...')
-for step in range(len(road_profile) - 1):
-    Zb, Zb_dt, Zb_dtdt, Zt, Tz_dt, Zt_dtdt, last_i, Zh, Zh_dt = x
+    env = Simulator(road_profile)
+    x = env.states[-1]
+    print('Simulating...')
+    for step in range(len(road_profile) - 1):
+        Zb, Zb_dt, Zb_dtdt, Zt, Tz_dt, Zt_dtdt, last_i, Zh, Zh_dt = x
 
-    # add a moving average of the last states to the model's input
-    moving_avg = env.moving_average()
-    x = np.concatenate((x, moving_avg))
+        # add a moving average of the last states to the model's input
+        moving_avg = env.moving_average()
+        x = np.concatenate((x, moving_avg))
 
-    x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
-    i = model(x_torch)[0,0].detach().numpy() * 2
+        x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
+        i = model(x_torch)[0,0].detach().numpy() * 2
 
-    t = DT * step
-    history.append([t, Zh, Zt, Zb, Zt_dtdt, Zb_dtdt, i])
+        t = DT * step
+        history.append([t, Zh, Zt, Zb, Zt_dtdt, Zb_dtdt, i])
 
-    # next step in the simulation
-    x = env.next(i)
+        # next step in the simulation
+        x = env.next(i)
 
-print('T_target:', t_target(history))
-print('Constraint satisfied:', constraint_satisfied(history))
+    print('T_target:', t_target(history))
+    print('Constraint satisfied:', constraint_satisfied(history))
 
-df = pd.DataFrame(data=history, columns=['t', 'Zh', 'Zt', 'Zb', 'Zt_dtdt', 'Zb_dtdt', 'i'])
-print(df)
-df.to_csv('result.csv')
+    df = pd.DataFrame(data=history, columns=['t', 'Zh', 'Zt', 'Zb', 'Zt_dtdt', 'Zb_dtdt', 'i'])
+    print(df)
+    df.to_csv('result.csv', index=False)
