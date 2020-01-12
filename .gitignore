@@ -142,3 +142,6 @@ models/
 
 # plots
 *.png
+
+# pickle files
+*.pickle
