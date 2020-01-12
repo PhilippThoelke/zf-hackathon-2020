@@ -10,7 +10,7 @@ VEL = [8, 20, 27]
 #simuation interval in seconds
 DT = 0.005
 #record location
-ROADPROFILELOCATION = 'datasets/'
+ROADPROFILELOCATION = '../datasets/'
 LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv']
 
 class ProfileManager:
