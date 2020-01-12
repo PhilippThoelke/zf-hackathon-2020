@@ -74,10 +74,8 @@ for step in range(len(road_profile) - 1):
     # next step in the simulation
     x = env.next(i)
 
-df = pd.read_csv('result.csv')
-
-print('T_target:', t_target(df.values))
-print('Constraint satisfied:', constraint_satisfied(df.values))
+print('T_target:', t_target(history))
+print('Constraint satisfied:', constraint_satisfied(history))
 
 df = pd.DataFrame(data=history, columns=['t', 'Zh', 'Zt', 'Zb', 'Zt_dtdt', 'Zb_dtdt', 'i'])
 print(df)
