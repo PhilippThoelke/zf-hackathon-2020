@@ -135,6 +135,7 @@ if __name__ == '__main__':
         file.write('POP_SIZE {}\n'.format(POPULATION_SIZE))
         file.write('N_SURVIVORS {}\n'.format(NUM_SURVIVORS))
         file.write('M_RATE {}\n'.format(MUTATION_RATE))
+        file.write('M_SCALE {}\n'.format(MUTATION_SCALE))
         file.write('STEPS {}\n'.format(EVALUATION_STEPS))
         file.write('REPEATS {}\n'.format(EVALUATION_REPEATS))
         file.write('EPOCHS {}\n'.format(EPOCHS))
