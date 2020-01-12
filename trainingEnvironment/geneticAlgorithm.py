@@ -15,7 +15,8 @@ class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(9, 4), torch.sigmoid,
+            nn.Linear(18, 8), torch.sigmoid,
+            nn.Linear(8, 4), torch.sigmoid,
             nn.Linear(4, 1), torch.sigmoid
         ]
 
@@ -40,8 +41,7 @@ class GeneticAlgorithm:
         for step in range(EVALUATION_REPEATS):
             # choose a random road from the CSVs
             road = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.training_profile))]
-            # TO DO : choose k
-            k = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.k))]
+            k = 20#self.road_profile.k[np.random.randint(0, len(self.road_profile.k))]
             # choose a random offset from the start of the current road
             road_offset = np.random.randint(0, len(road) - EVALUATION_STEPS)
 
@@ -87,6 +87,10 @@ class GeneticAlgorithm:
         env = Simulator(road_profile, road_offset, k)
         x = env.states[-1]
         for step in range(EVALUATION_STEPS):
+            # add a moving average of the last states to the model's input
+            moving_avg = env.moving_average()
+            x = np.concatenate((x, moving_avg))
+
             # simulate the car's behaviour and pass new i (damper current) values
             x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
             x = env.next(model(x_torch)[0,0] * 2)

@@ -39,6 +39,9 @@ class Simulator:
     def get_states(self):
         return np.array(self.states)
 
+    def moving_average(self):
+        return np.array(self.states)[-MOVING_AVG_COUNT:].mean(axis=0)
+
     def t_target(self):
         last = self.get_states()
 
