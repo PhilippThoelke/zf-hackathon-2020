@@ -19,6 +19,8 @@ EVALUATION_STEPS = 1500
 # Data
 # driving speed [m/s] between 2 and 40
 VEL = [8, 20, 27]
+# road type e.g. highway
+K = [3,20]
 #simuation interval in seconds
 DT = 0.005
 #record location

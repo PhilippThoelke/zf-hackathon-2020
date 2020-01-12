@@ -21,7 +21,6 @@ class Simulator:
         self.current_road_position = road_offset + 1
         self.road_profile = road_profile
         self.k = k
-
         self.states = []
         self.reset()
 

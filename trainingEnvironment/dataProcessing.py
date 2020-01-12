@@ -12,12 +12,13 @@ class ProfileManager:
 
         #loading records
         #list of road specific weight factors
-        self.K = []
-        for roadProfile in LISTDATA:
-            tmp = roadProfile.split("_k_")
-            tmp = tmp[1]
-            k = float(tmp[:-4])
-            self.K.append(k)
+        self.k = K
+
+        #for roadProfile in LISTDATA:
+        #    tmp = roadProfile.split("_k_")
+        #    tmp = tmp[1]
+        #    k = float(tmp[:-4])
+        #    self.K.append(k)
 
         self.training_profile = []
         self.validation_profile = []

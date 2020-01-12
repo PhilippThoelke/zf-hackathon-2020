@@ -40,11 +40,13 @@ class GeneticAlgorithm:
         for step in range(EVALUATION_REPEATS):
             # choose a random road from the CSVs
             road = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.training_profile))]
+            # TO DO : choose k
+            k = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.k))]
             # choose a random offset from the start of the current road
             road_offset = np.random.randint(0, len(road) - EVALUATION_STEPS)
 
             # evaluate all models on the current road section
-            fitness += Parallel(n_jobs=-1)(delayed(GeneticAlgorithm._simulate)(model, road, road_offset) for model in self.population)
+            fitness += Parallel(n_jobs=-1)(delayed(GeneticAlgorithm._simulate)(model, road, road_offset, k) for model in self.population)
 
         # return the mean fitness for each model across multiple road sections
         return fitness / len(self.population)
@@ -80,9 +82,9 @@ class GeneticAlgorithm:
         model.load_state_dict(torch.load(path))
         return model
 
-    def _simulate(model, road_profile, road_offset):
+    def _simulate(model, road_profile, road_offset, k=3):
         # instantiate a new simulator
-        env = Simulator(road_profile, road_offset)
+        env = Simulator(road_profile, road_offset, k)
         x = env.states[-1]
         for step in range(EVALUATION_STEPS):
             # simulate the car's behaviour and pass new i (damper current) values
