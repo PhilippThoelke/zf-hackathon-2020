@@ -23,15 +23,16 @@ With 'Simulator.next(i_new)' a new state is computed using 'Simulator.active_sus
 The Simulator also computes the value of the objective function 'Simulator.t_target()' and checks if the constraints given by 'Simulator.constraint_satisfied()' are met in order to compute a final score which can be used as a fitness function to select well performing neural networks. All this is done by calling 'Simulator.score()'
 
 A states is given by the following 9-tuple: (Zb, Zb_dt, Zb_dtdt, Zt, Zt_dt, Zt_dtdt, i, Zh, Zh_dt)
-    * Zb: z-position body [m]
-    * Zt: z-position tire [m]
-    * Zh: road profie [m]
-    * Zb_dt: velocity body in z [m/s]
-    * Zt_dt: velocity tire in z [m/s]
-    * Zh_dt: velocity road profile in z [m/s]
-    * ...
-    * x_dtdt: specific acceleration in [m/s^2]
-    * i: current of active suspension from 0 to 2 [A]
+
+* Zb: z-position body [m]
+* Zt: z-position tire [m]
+* Zh: road profie [m]
+* Zb_dt: velocity body in z [m/s]
+* Zt_dt: velocity tire in z [m/s]
+* Zh_dt: velocity road profile in z [m/s]
+* ...
+* x_dtdt: specific acceleration in [m/s^2]
+* i: current of active suspension from 0 to 2 [A]
 
 ### geneticAlgorithm
 This is the heart of the whole project and has to be executed in order to train a model.
@@ -89,14 +90,18 @@ We mainly tried out two different architectures for the networks, one with only 
 ## Evaluation & Findings
 - convolution deos not make a difference
 - training on randomly chosen ks disrupt the training process: it seems to be a better idea to train a network for each k and than select which net is needed when performing
-- running average: ?
 - on the initial data a constant i of 0 outperformed all of our trained models
+- running average does not seem to have a really big impact
+
+Not available for evaluation due to unfinished training:
+- different architectures
+- different mutation parameters
 
 ## Outlook
 We chose to create our training environment in a way that makes it compatible with reinforcement learning.
 [Based on this paper](http://proceedings.mlr.press/v80/lee18b/lee18b.pdf) we planned on implementing a second branch of the ANN predicting a future reward for the predicted current.
 
-## Methods and Remarks.
+## Methods and Remarks
 ### Alternative Methods
 Before deciding on genetic algorithm we discussed different approaches.
 Mainly we discussed implementing a road prediction framework and then use this predictions to approximate future states and thus being able to linear solve for an optimal current. However we decided against this, since we would need a really good road prediction in order to achieve good results. But due to a lack of quantity and quality in the given data achieving a good enough road prediction did not seem feasible.
