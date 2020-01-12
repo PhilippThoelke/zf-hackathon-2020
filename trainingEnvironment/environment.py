@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import signal
+from hyperparameters import *
 
 #do not change constants parameter
 Mb = 500        #mass quarter body [kg]
@@ -13,7 +14,7 @@ c = 560         #linear constant of active suspension [N/A]
 #do not change constants parameter
 
 # dt constant
-dt = 0.005
+dt = DT
 
 class Simulator:
     def __init__(self, road_profile, road_offset=0, k=3):

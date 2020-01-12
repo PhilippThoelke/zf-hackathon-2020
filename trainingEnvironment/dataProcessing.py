@@ -3,15 +3,8 @@ import csv
 import os
 from scipy import signal
 from matplotlib import pyplot as plt
+from hyperparameters import *
 
-# HYPERPARAMETER
-# driving speed [m/s] between 2 and 40
-VEL = [8, 20, 27]
-#simuation interval in seconds
-DT = 0.005
-#record location
-ROADPROFILELOCATION = '../datasets/'
-LISTDATA = ['ts1_2_k_3.0.csv', 'ts1_1_k_3.0.csv', 'ts1_3_k_3.0.csv', 'ts1_4_k_3.0.csv']
 
 class ProfileManager:
 
