@@ -8,14 +8,14 @@ from joblib import Parallel, delayed
 import datetime
 import os
 from hyperparameters import *
+import pickle
 
 
 class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
         self.layers = [
-            nn.Linear(9, 4), torch.relu,
-            nn.Linear(4, 4), torch.relu,
+            nn.Linear(9, 4), torch.sigmoid,
             nn.Linear(4, 1), torch.sigmoid
         ]
 
@@ -26,14 +26,14 @@ class ANN(nn.Module):
 
 class GeneticAlgorithm:
 
-
     def __init__(self):
         self.history = []
         print('Generating population...')
         self.population = np.array([GeneticAlgorithm._get_model() for _ in range(POPULATION_SIZE)])
 
         print('Loading road profile...')
-        self.road_profile = ProfileManager()
+        with open('road_profile.pickle', 'rb') as file:
+            self.road_profile = pickle.load(file)
 
     def evaluate(self):
         fitness = np.zeros(len(self.population))
@@ -128,6 +128,18 @@ if __name__ == '__main__':
     timestamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')
     path = '../models/' + timestamp
     os.makedirs(path)
+
+    with open(path + '/model.meta', 'w') as file:
+        file.write('POP_SIZE {}\n'.format(POPULATION_SIZE))
+        file.write('N_SURVIVORS {}\n'.format(NUM_SURVIVORS))
+        file.write('M_RATE {}\n'.format(MUTATION_RATE))
+        file.write('STEPS {}\n'.format(EVALUATION_STEPS))
+        file.write('REPEATS {}\n'.format(EVALUATION_REPEATS))
+        file.write('EPOCHS {}\n'.format(EPOCHS))
+        file.write('\nMODEL_ARCHITECTURE:\n')
+        a = ANN()
+        file.write('\n'.join(['{}: {}->{}'.format(a.layers[i]._get_name(), a.layers[i].in_features, a.layers[i].out_features) for i in range(len(a.layers)) if hasattr(a.layers[i], 'in_features')]))
+
 
     ga = GeneticAlgorithm()
     for epoch in range(EPOCHS):
