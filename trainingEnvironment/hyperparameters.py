@@ -10,10 +10,10 @@ EPOCHS = 50
 # number of nets in a generation
 POPULATION_SIZE = 16
 # number of best nets wich remain unchanged
-NUM_SURVIVORS = 6
+NUM_SURVIVORS = 8
 # prameters for mutation and crossover
-MUTATION_RATE = 0.02
-MUTATION_SCALE = 0.5
+MUTATION_RATE = 0.01
+MUTATION_SCALE = 0.3
 # how many road position we look at for each epoch
 EVALUATION_REPEATS = 3
 # how many steps we train from the picked road position onwards
