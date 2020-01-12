@@ -7,6 +7,8 @@ from torch import nn
 from joblib import Parallel, delayed
 import datetime
 import os
+from hyperparameters import *
+
 
 class ANN(nn.Module):
     def __init__(self):
@@ -24,29 +26,22 @@ class ANN(nn.Module):
 
 class GeneticAlgorithm:
 
-    EPOCHS = 250
-    POPULATION_SIZE = 40
-    NUM_SURVIVORS = 8
-    MUTATION_RATE = 0.025
-    MUTATION_SCALE = 1
-    EVALUATION_STEPS = 1500
-    EVALUATION_REPEATS = 8
 
     def __init__(self):
         self.history = []
         print('Generating population...')
-        self.population = np.array([GeneticAlgorithm._get_model() for _ in range(GeneticAlgorithm.POPULATION_SIZE)])
+        self.population = np.array([GeneticAlgorithm._get_model() for _ in range(POPULATION_SIZE)])
 
         print('Loading road profile...')
         self.road_profile = ProfileManager()
 
     def evaluate(self):
         fitness = np.zeros(len(self.population))
-        for step in range(GeneticAlgorithm.EVALUATION_REPEATS):
+        for step in range(EVALUATION_REPEATS):
             # choose a random road from the CSVs
             road = self.road_profile.training_profile[np.random.randint(0, len(self.road_profile.training_profile))]
             # choose a random offset from the start of the current road
-            road_offset = np.random.randint(0, len(road) - GeneticAlgorithm.EVALUATION_STEPS)
+            road_offset = np.random.randint(0, len(road) - EVALUATION_STEPS)
 
             # evaluate all models on the current road section
             fitness += Parallel(n_jobs=-1)(delayed(GeneticAlgorithm._simulate)(model, road, road_offset) for model in self.population)
@@ -62,9 +57,9 @@ class GeneticAlgorithm:
         indices = np.argsort(fitness)
         fitness = fitness[indices]
         self.population = self.population[indices]
-        for i in range(GeneticAlgorithm.NUM_SURVIVORS, len(self.population)):
+        for i in range(NUM_SURVIVORS, len(self.population)):
             # randomly choose two parents from the surviving population
-            parent1, parent2 = np.random.choice(self.population[:GeneticAlgorithm.NUM_SURVIVORS], size=2, replace=False)
+            parent1, parent2 = np.random.choice(self.population[:NUM_SURVIVORS], size=2, replace=False)
             weights1 = GeneticAlgorithm._get_weights(parent1)
             weights2 = GeneticAlgorithm._get_weights(parent2)
 
@@ -89,7 +84,7 @@ class GeneticAlgorithm:
         # instantiate a new simulator
         env = Simulator(road_profile, road_offset)
         x = env.states[-1]
-        for step in range(GeneticAlgorithm.EVALUATION_STEPS):
+        for step in range(EVALUATION_STEPS):
             # simulate the car's behaviour and pass new i (damper current) values
             x_torch = torch.from_numpy(x.reshape((1,) + x.shape))
             x = env.next(model(x_torch)[0,0] * 2)
@@ -109,9 +104,9 @@ class GeneticAlgorithm:
     def _mutate(weights):
         new_weights = []
         for var in weights:
-            mask = torch.rand(size=var.shape) < GeneticAlgorithm.MUTATION_RATE
+            mask = torch.rand(size=var.shape) < MUTATION_RATE
             new_var = var.clone()
-            new_var[mask] += torch.randn(size=var.shape)[mask] * GeneticAlgorithm.MUTATION_SCALE
+            new_var[mask] += torch.randn(size=var.shape)[mask] * MUTATION_SCALE
             new_weights.append(new_var)
         return new_weights
 
@@ -135,7 +130,7 @@ if __name__ == '__main__':
     os.makedirs(path)
 
     ga = GeneticAlgorithm()
-    for epoch in range(GeneticAlgorithm.EPOCHS):
+    for epoch in range(EPOCHS):
         if epoch > 0:
             print(f'Optimization step {epoch} (fitness: {ga.history[-1]})')
         best = ga.optimization_step()
