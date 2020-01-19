@@ -68,13 +68,13 @@ We trained different alternations to evaluate later:
 ### Default
 We normally trained on all data sets except "" and used 3 different velocities namely 8, 20 and 27 m/s. The default value for k was 3.
 The commonly used values for the genetic algorithm were:
-- EPOCHS = 1000
-- EVALUATION_REPEATS = 10
-- EVALUATION_STEPS = 1000
+- EPOCHS = 300
+- EVALUATION_REPEATS = 5
+- EVALUATION_STEPS = 5000
 - POPULATION_SIZE = 96
-- NUM_SURVIVORS = 18
-- MUTATION_RATE = 0.015
-- MUTATION_SCALE = 0.3
+- NUM_SURVIVORS = 8
+- MUTATION_RATE = 0.01
+- MUTATION_SCALE = 0.75
 
 ### Dense vs. Convolution
 We used different neural network architectures where we either only used dense layers combined with sigmoid activation functions or convolutional layers. In the convolutional networks we also tried passing on more than one single state to the network but a certain number of previous states.
@@ -86,6 +86,7 @@ Instead of just passing on a single state to the neural networks we tried passin
 We mainly tried out two different architectures for the networks, one with only one hidden layer and one with two.
 1. Input: 9, Hidden: 8 4 Output: 1
 2. Input: 9, Hidden: 8, Output: 1
+3. Input: 18, Hidden: 4 4, Output: 1
 
 ## Evaluation & Findings
 - convolution deos not make a difference
